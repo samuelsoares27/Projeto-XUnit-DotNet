@@ -1,27 +1,51 @@
-﻿using Moq;
+﻿using Bogus;
+using CursoOnline.DominioTest._Utils;
+using Moq;
 
 namespace CursoOnline.DominioTest.Cursos
 {
     public class ArmazenadorDeCursoTest
     {
+        private readonly CursoDto _cursoDto;
+        private readonly Mock<ICursoRepositorio> _cursoRepositorioMock;
+        private readonly ArmazenadorDeCurso _armazenadorDeCurso;
+
+        public ArmazenadorDeCursoTest()
+        {
+            var fake = new Faker();
+            _cursoDto = new CursoDto
+            {
+                Nome = fake.Random.Word(),
+                CargaHoraria = fake.Random.Double(50, 1000),
+                PublicoAlvo = "Estudante",
+                Valor = fake.Random.Double(50, 1000),
+            };
+            _cursoRepositorioMock = new Mock<ICursoRepositorio>();
+            _armazenadorDeCurso = new ArmazenadorDeCurso(_cursoRepositorioMock.Object);
+        }
         [Fact]
         public void DeveAdicionarCurso()
         {
-            // Asserts
-            var cursoDto = new CursoDto
-            {
-                Nome = "Curso A",
-                CargaHoraria = 100,
-                PublicoAlvo = 1,
-                Valor = 100,
-            };
+            _armazenadorDeCurso.Armazenar(_cursoDto);
 
-            var cursoRepositorioMock = new Mock<ICursoRepositorio>();
-            var armazenadorDeCurso = new ArmazenadorDeCurso(cursoRepositorioMock.Object);
-
-            armazenadorDeCurso.Armazenar(cursoDto);
-
-            cursoRepositorioMock.Verify(r => r.Adicionar(It.IsAny<Curso>()));
+            _cursoRepositorioMock.Verify(r => r.Adicionar(
+                It.Is<Curso>(
+                    c => c.Nome == _cursoDto.Nome &&
+                    c.CargaHoraria == _cursoDto.CargaHoraria &&
+                    c.Valor == _cursoDto.Valor
+                    )
+                ));
         }
+
+        [Fact]
+        public void NaoDeveInformarPublicoAlvoInvalido()
+        {
+            var publicoAlvoInvalido = "Médico";
+            _cursoDto.PublicoAlvo = publicoAlvoInvalido;
+
+            Assert.Throws<ArgumentException>(() => _armazenadorDeCurso.Armazenar(_cursoDto))
+                .ComMensagem("Público Alvo Inválido");
+        }
+
     }
 }

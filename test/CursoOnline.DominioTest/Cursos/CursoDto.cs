@@ -2,9 +2,9 @@
 {
     public class CursoDto
     {
-        public string Nome { get; set; }
-        public int CargaHoraria { get; set; }
-        public int PublicoAlvo { get; set; }
-        public int Valor { get; set; }
+        public string Nome { get; set; } = string.Empty;
+        public double CargaHoraria { get; set; }
+        public string PublicoAlvo { get; set; } = string.Empty;
+        public double Valor { get; set; }
     }
 }

@@ -9,7 +9,13 @@
         }
         public void Armazenar(CursoDto cursoDto)
         {
-            var curso = new Curso(cursoDto.Nome, cursoDto.CargaHoraria, PublicoAlvo.Empregado, cursoDto.Valor);
+            Enum.TryParse(typeof(PublicoAlvo), cursoDto.PublicoAlvo, out var publicoAlvo);
+
+            if(publicoAlvo == null)             
+                throw new ArgumentException();
+            
+
+            var curso = new Curso(cursoDto.Nome, cursoDto.CargaHoraria, (PublicoAlvo)publicoAlvo, cursoDto.Valor);
 
             _cursoRepositorio.Adicionar(curso);
         }

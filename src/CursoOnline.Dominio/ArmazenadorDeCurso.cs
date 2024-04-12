@@ -9,6 +9,12 @@
         }
         public void Armazenar(CursoDto cursoDto)
         {
+
+            var cursoJaSalvo = _cursoRepositorio.ObterPeloNome(cursoDto.Nome);
+
+            if(cursoJaSalvo != null)
+                throw new ArgumentException("Nome do curso já consta no banco de dados");
+
             Enum.TryParse(typeof(PublicoAlvo), cursoDto.PublicoAlvo, out var publicoAlvo);
 
             if(publicoAlvo == null)             
